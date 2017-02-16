@@ -4,7 +4,7 @@
 import MySQLdb
 
 
-class instance():
+class instance(object):
     def __init__(self, host, port, user, passwd, dbname='None'):
         self.dbhost = host
         self.dbport = int(port)
@@ -30,20 +30,20 @@ class instance():
         self.conn = None
 
     def execsql(self, sql):
-        cursor = self.conn.cursor()
+        cursor = self.conn.cursor(cursorclass=cursors.DictCursor)
         cursor.execute(sql)
         self.conn.commit()
         cursor.close()
 
     def fetchone(self,sql):
-        cursor = self.conn.cursor()
+        cursor = self.conn.cursor(cursorclass=cursors.DictCursor)
         cursor.execute(sql)
         onedata = cursor.fetchone()
         cursor.close()
         return onedata
 
     def fetchall(self,sql):
-        cursor = self.conn.cursor()
+        cursor = self.conn.cursor(cursorclass=cursors.DictCursor)
         cursor.execute(sql)
         alldata = cursor.fetchall()
         cursor.close()
