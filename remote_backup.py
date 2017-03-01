@@ -31,7 +31,7 @@ def remote_physic_backup(rem_conn_par, db_back_par):
         else:
             False
     else:
-        print 'check remote path!'
+        print ('check remote path!')
         return False
 
 
@@ -42,9 +42,9 @@ if __name__ == '__main__':
     result=remote_physic_backup(rem_conn_par, db_back_par)
     print result
     if result:
-        print 'backup is ok!'
+        print ('backup is ok!')
     else:
-        print 'backup is faild!'
+        print ('backup is faild!')
 
 
 

@@ -86,17 +86,3 @@ class RunCommand(object):
 
 
 
-
-
-'''cmd='ls '+ path
-            print cmd
-            stdin, stdout, stderr = client.exec_command(cmd)
-            result = stderr.readline()
-            print result
-            if 'No such file or directory' in result:
-                cmd='sudo mkdir -p %s' % path
-                stdin, stdout, stderr = client.exec_command(cmd)
-                print ('stdout',stdout.readlines())
-                print ('stderr',stdout.readlines())
-                result=stdout.readlines()
-'''

@@ -24,18 +24,14 @@ class DbBackup(object):
             self.default_file = conf
         self.target_dir = target_dir
 
-    # 备份
+    # 物理备份
     def physic_backup(self):
         command = "{0} --defaults-file={1} --user={2} --password='{3}' --host=localhost --port={4} --no-timestamp --parallel=4 --throttle=500 --use-memory=2GB --stream=xbstream ./ > {5}".format(
             pt_xtrabackup, self.default_file, self.user, self.passwd, self.port, self.target_dir)
 
         return command
-        '''
-        status = self.local_cmd(command)
-        if "completed OK!" in status:
-            return True
-        '''
 
+    # 逻辑备份
     def logical_backup(self):
         pass
 
