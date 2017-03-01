@@ -5,19 +5,19 @@
 @Time    : 2017/2/13 下午2:25
 @Author  : hz.c
 @Site    : 
-@File    : backup.py
+@File    : backup_recovery.py
 @Software: PyCharm
 '''
 
+pt_xtrabackup = "/usr/bin/innobackupex"
 
-import BaseModule.instance
-
-class physic_backup(object):
+#备份模块
+class DbBackup(object):
     global pt_xtrabackup
     def __init__(self, db_user, db_passwd, db_port=None, conf='None', target_dir='None'):
         self.user = db_user
         self.passwd = db_passwd
-        self.port = db_port
+        self.port = int(db_port)
         if (conf == 'None'):
             self.default_file = '/etc/my.cnf'
         else:
@@ -25,9 +25,9 @@ class physic_backup(object):
         self.target_dir = target_dir
 
     # 备份
-    def backup(self, user, passwd, port, defaults_file, target_dir):
+    def physic_backup(self):
         command = "{0} --defaults-file={1} --user={2} --password='{3}' --host=localhost --port={4} --no-timestamp --parallel=4 --throttle=500 --use-memory=2GB --stream=xbstream ./ > {5}".format(
-            pt_xtrabackup, defaults_file, user, passwd, port, target_dir)
+            pt_xtrabackup, self.default_file, self.user, self.passwd, self.port, self.target_dir)
 
         return command
         '''
@@ -36,8 +36,6 @@ class physic_backup(object):
             return True
         '''
 
-
-
-class logical_backup(object):
-    def __init__(self):
+    def logical_backup(self):
         pass
+
