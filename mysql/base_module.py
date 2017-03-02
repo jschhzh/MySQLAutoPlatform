@@ -3,7 +3,7 @@
 
 import pymysql
 
-
+#数据库操作命令
 class MySQLOperations(object):
     def __init__(self, db_host, db_port, db_user, db_passwd, db_name='mysql', charset='utf8'):
         self.conn_conf = {'host': db_host, 'port': db_port, 'user': db_user, 'password': db_passwd, 'db': db_name,
@@ -47,7 +47,8 @@ class MySQLOperations(object):
         result = self.cursor.fetchall()
         return result
 
-
+    def shutdown(self):
+        pass
 
 if __name__ == '__main__':
     a=MySQLOperations('172.19.22.201',3306,'root','123456')

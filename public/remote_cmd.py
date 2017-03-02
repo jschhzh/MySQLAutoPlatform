@@ -77,10 +77,16 @@ class RunCommand(object):
         print result
         if result:
             cmd = 'mkdir -p %s' % path
-            result=self.remote_cmd_err(cmd)
-            if not result:
-                return True
-            False
+            if self.user_info["ip"] != "127.0.0.1":
+                result=self.remote_cmd_err(cmd)
+                if not result:
+                    return True
+                False
+            elif self.user_info["ip"] == "127.0.0.1":
+                result = self.local_cmd(cmd)
+                if not result:
+                    return True
+                False
         return True
 
 
