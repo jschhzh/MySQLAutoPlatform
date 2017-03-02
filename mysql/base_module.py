@@ -48,3 +48,10 @@ class MySQLOperations(object):
         return result
 
 
+
+if __name__ == '__main__':
+    a=MySQLOperations('172.19.22.201',3306,'root','123456')
+    a.db_connect()
+    result=a.fetch_all('select user,host,authentication_string from mysql.user;')
+    print (result)
+    a.disconnect()
