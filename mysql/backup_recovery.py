@@ -85,25 +85,24 @@ class DbRecovery(object):
         db_control = MySQLControl(self.db_conf['mysqld_dir'], rem_conn_par)
         db_instance = MySQLOperations(db_conf['db_host'], db_conf['db_port'], db_conf['db_user'], db_conf['db_passwd'])
 
-
-        if not db_instance.db_connect():
-            pass
-        else:
+        if db_instance.db_connect():
             db_instance.disconnect()
             result = db_control.stop_db()
-
             if not result:
                 print "stop db is faild!"
                 return False
+        else:
+            pass
 
         """ clear data dir"""
         cmd = "rm -rf %s*" % db_conf['data_dir']
         print cmd
         remote_run_com.remote_cmd(cmd)
         """Download the backup file"""
-        # cmd = self.source_url + ' -C ' + self.db_conf['data_dir']
-        # get_bak_file = remote_run_com.remote_cmd(cmd)
-        get_bak_file = True
+        cmd = self.source_url + ' -P ' + self.db_conf['data_dir']
+        print cmd
+        get_bak_file = remote_run_com.remote_cmd(cmd)
+        #get_bak_file = True
         if get_bak_file:
             cmd = "xbstream -x -v < %s%s -C  %s" % (
                 self.db_conf['data_dir'], self.source_url.split('/')[-1], self.db_conf['data_dir'])
@@ -132,13 +131,47 @@ class DbRecovery(object):
                     print RecoveryError
                     return RecoveryError
 
+    def remote_recovery_anytime(self,rem_conn_par,binlog_info,recovery_par):
+        remote_run_com = RunCommand(rem_conn_par)
+        if self.remote_recovery(rem_conn_par):
+            cmd = "cat %sxtrabackup_binlog_info" % db_conf['data_dir']
+            result = remote_run_com.remote_cmd(cmd, 'all')
+            start_binlog_file = result.split()[0]
+            start_binlog_pos = result.split()[1]
+            stop_binlog_file=recovery_par['stop_binlog_file']
+            stop_binlog_time=recovery_par['stop_binlog_time']
+            for binlog_file in binlog_info:
+                cmd = self.binlog_file['source_url'] + ' -P ' + self.db_conf['data_dir']
+                get_binlog_file = remote_run_com.remote_cmd(cmd)
+
+    def replication_recovery(self, rem_conn_par, rep_info):
+        remote_run_com = RunCommand(rem_conn_par)
+        db_instance = MySQLOperations(db_conf['db_host'], db_conf['db_port'], db_conf['db_user'], db_conf['db_passwd'])
+        if self.remote_recovery(rem_conn_par):
+            cmd = "cat %sxtrabackup_binlog_info" % db_conf['data_dir']
+            result = remote_run_com.remote_cmd(cmd, 'all')
+            gtid = ''.join(result.split()[2:])
+            db_instance.db_connect()
+            sql = "reset master;set SET GLOBAL gtid_purged=\'%s\'" % gtid
+            print sql
+            db_instance.exec_sql(sql)
+            sql = "CHANGE MASTER TO master_host=\'%s\',master_port=\s,master_user=\'%s\', master_password=\'%s\',master_connect_retry=10,MASTER_AUTO_POSITION = 1;" % (
+                rep_info['master_host'], int(rep_info['master_port']), rep_info['rep_user'], rep_info['rep_passwd'])
+            db_instance.exec_sql(sql)
+            sql = "start slave;select sleep(3);show slave status;"
+            result = db_instance.fetch_all(sql)
+            print result
+        else:
+            print 'backup recovery faild!'
+
 
 if __name__ == '__main__':
-    rem_conn_par = {"ip": "172.19.22.202", "user": "root", "password": "123456",}
-    db_conf = {"db_host": "172.19.22.202", "db_port": "3306", "db_user": "root", "db_passwd": "123456",
-               "cnf_dir": "/etc/my.cnf",
-               "mysqld_dir": "/etc/init.d/mysql",
-               "data_dir": "/data/mysql/mysql3306/data/"}
-    phy_bak = DbRecovery('/test_1', db_conf)
+    rem_conn_par = {"ip": "", "user": "root", "password": "",}
+    db_conf = {"db_host": "", "db_port": "3302", "db_user": "", "db_passwd": "",
+               "cnf_dir": "/etc/my3302.cnf",
+               "mysqld_dir": "/etc/init.d/mysql3302",
+               "data_dir": "/data2/mysql/data/"}
+    phy_bak = DbRecovery("wget --ftp-user=", db_conf)
     result = phy_bak.remote_recovery(rem_conn_par)
+    #result = phy_bak.replication_recovery(rem_conn_par)
     print result

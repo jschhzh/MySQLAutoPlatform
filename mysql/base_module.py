@@ -6,7 +6,7 @@ from MySQLAutoPlatform.public.remote_cmd import RunCommand
 
 #数据库操作命令
 class MySQLOperations(object):
-    def __init__(self, db_host, db_port, db_user, db_passwd, db_name='information_schema', charset='utf8'):
+    def __init__(self, db_host, db_port, db_user, db_passwd, db_name='mysql', charset='utf8'):
         self.conn_conf = {'host': db_host, 'port': int(db_port), 'user': db_user, 'password': db_passwd, 'db': db_name,
                           'charset': charset, 'cursorclass': pymysql.cursors.DictCursor,
                           }
@@ -79,17 +79,17 @@ class MySQLControl(object):
 
 
 if __name__ == '__main__':
-    rem_conn_par = {"ip": "172.19.22.202", "user": "root", "password": "123456",}
-    a=MySQLControl('/etc/init.d/mysql',rem_conn_par)
-    a.stop_db()
+    #rem_conn_par = {"ip": "172.19.22.202", "user": "root", "password": "123456",}
+    #a=MySQLControl('/etc/init.d/mysql',rem_conn_par)
+    #a.stop_db()
 
 
-    """
-    a=MySQLOperations('172.19.22.201',3306,'root','123456')
+
+    a=MySQLOperations('172.19.22.202','3306','root','123456')
     a.db_connect()
-    result=a.fetch_all('select user,host,authentication_string from mysql.user;')
+    result=a.fetch_all('show master status;')
     print (result)
     a.disconnect()
-"""
+
 
 

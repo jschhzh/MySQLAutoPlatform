@@ -20,7 +20,7 @@ class RunCommand(object):
         self.env=env
 
     # 返回命令正常输出
-    def remote_cmd(self, cmd):
+    def remote_cmd(self, cmd,type='readlines'):
         if self.user_info["ip"] != "127.0.0.1":
             client = paramiko.SSHClient()
             client.load_system_host_keys()
@@ -31,9 +31,14 @@ class RunCommand(object):
             client.connect(
                 ip_addr, port=int(22), username=username, password=passwd, timeout=5)
             stdin, stdout, stderr = client.exec_command(cmd)
-            result = stdout.readlines()
-            client.close()
-            return result
+            if type=='all':
+                result = stdout.read()
+                client.close()
+                return result
+            else:
+                result=stdout.readlines()
+                client.close()
+                return result
         elif self.user_info["ip"] == "127.0.0.1":
             stdout = self.local_cmd(cmd, self.env)
             return stdout
